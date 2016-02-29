@@ -26,7 +26,8 @@ class Lie:
     background = lie_path + '/background.png'
     eat_bonus = lie_path + '/pill.png'
     bonus = lie_path + '/coffee.png'
-    gameover = lie_path + '/GameOver.png'
+    stupidghost = lie_path + '/ScaryGhost.png'
+    gameover = lie_path + '/game_over.png'
 
 
 def init_window():
@@ -67,11 +68,16 @@ class GameObject(pygame.sprite.Sprite):
 
 
 class Ghost(GameObject):
+    """
+    This class has been made to describe Ghosts as objects
+
+    """
     ghosts = []
     num = 3
 
     def __init__(self, x, y):
-        GameObject.__init__(self, Lie.ghost, x, y)
+        self.stupidness = random.randint(0, 1)
+        GameObject.__init__(self, Lie.ghost, x, y) if self.stupidness == 0 else GameObject.__init__(self, Lie.stupidghost, x, y)
         self.direction = 0
         self.velocity = 4.0 / 10.0
 
@@ -165,16 +171,17 @@ class Ghost(GameObject):
                 self.y = 0
                 self.direction = random.randint(1, 4)
         if floor(pacman.x) == floor(self.x) and floor(pacman.y) == floor(self.y) and EatBonus.eat_bonus:
-              Ghost.ghosts.remove(self)
+            Ghost.ghosts.remove(self)
         self.set_coord(self.x, self.y)
-        if floor(pacman.x) == floor(self.x) and floor(pacman.y) == floor(self.y) and not (EatBonus. eat_bonus):
+        if floor(pacman.x) == floor(self.x) and floor(pacman.y) == floor(self.y) and not EatBonus. eat_bonus:
             sys.exit(0)
+
 
 
 def create_ghost():
     Ghost.ghosts = [Ghost(1, 1) for i in range(Ghost.num)]
     for i in range(len(Ghost.ghosts)):
-        Ghost.ghosts[i].stupidness = random.randint(0,1)
+        Ghost.ghosts[i].stupidness = random.randint(0, 1)
 
 
 def draw_ghosts(screen):
@@ -268,6 +275,9 @@ def create_walls(coords):
 
 
 class Map:
+    """
+    This class is created to describe the initial position of objects.
+    """
     food = 0
 
     def __init__(self, filename):
@@ -290,7 +300,7 @@ class Map:
                 else:                    
                     self.map[-1].append(None) 
 
-    def draw(self,screen):
+    def draw(self, screen):
         for y in range(len(self.map)):
             for x in range(len(self.map[y])):
                 if self.map[y][x]: 
@@ -334,6 +344,7 @@ if __name__ == '__main__':
     backgfloor = pygame.image.load(Lie.background)
     screen = pygame.display.get_surface()
     create_ghost()
+
 
 def one_step_forward():
     process_events(pygame.event.get(), pacman)
